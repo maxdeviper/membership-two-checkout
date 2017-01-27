@@ -83,15 +83,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 			<input type='hidden' name='mode' value='2CO' />
             <input type='hidden' name='quantity' value='1'>
             <input type='hidden' name='product_id' value='1'>
-			<input type='hidden' name='card_holder_name' value='Checkout Shopper' />
-			<input type='hidden' name='street_address' value='123 Test Address' />
-			<input type='hidden' name='street_address2' value='Suite 200' />
-			<input type='hidden' name='city' value='Columbus' />
-			<input type='hidden' name='state' value='OH' />
-			<input type='hidden' name='zip' value='43228' />
-			<input type='hidden' name='country' value='USA' />
-			<input type='hidden' name='email' value='example@2co.com' />
-			<input type='hidden' name='phone' value='614-921-2450' />
 			<?php
 				foreach ( $fields as $field ) {
 					MS_Helper_Html::html_element( $field );
@@ -145,6 +136,16 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => wp_create_nonce( "{$gateway->id}_{$subscription->id}" ),
 			),
+            'sid' => array(
+                'id' => 'sid',
+                'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+                'value' => $gateway->get_seller_id(),
+            ),
+			'mode' => array(
+				'id' => 'mode',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => '2CO',
+			),
 			'gateway' => array(
 				'id' => 'gateway',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
@@ -164,11 +165,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'id' => 'step',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $this->data['step'],
-			),
-			'sid' => array(
-				'id' => 'sid',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => $gateway->get_seller_id(),
 			),
 		);
 
