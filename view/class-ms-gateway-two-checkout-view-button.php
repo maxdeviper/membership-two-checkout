@@ -51,7 +51,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
                 );
 		$two_checkout_data['metadata'] = json_encode($metadata);
 		$two_checkout_data['plan'] = get_option( MS_Gateway_Two_Checkout::TWO_CHECKOUT_OPTION_KEY)[$subscription->get_membership()->id]['code'] ;
-		$two_checkout_data['key'] = $gateway->get_public_key();
+		$two_checkout_data['key'] = $gateway->publishable_key();
 		$two_checkout_data['currency'] = apply_filters( 'ms_gateway_two_checkout_currency_to_use', 'NGN', $invoice);
 		$two_checkout_data['ref'] = apply_filters( 'ms_gateway_two_checkout_get_transaction_ref', mt_rand(1000,9999));
 		$two_checkout_data['amount'] = apply_filters( 'ms_gateway_two_checkout_amount_to_use', $invoice->total, $invoice); // Amount in kobo.

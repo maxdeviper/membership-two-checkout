@@ -43,38 +43,20 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
     protected $payment_info;
 
     /**
-     * 2Checkout test secret key (sandbox).
-     *
-     * 
-     *
-     * @since  1.0.0
-     * @var string $test_secret_key
-     */
-    protected $test_secret_key = '';
-
-    /**
      * 2Checkout Secret key (live).
      *
      * @since  1.0.0
-     * @var string $live_secret_key
+     * @var string $private_key
      */
-    protected $live_secret_key = '';
-
-    /**
-     * 2Checkout test public key (sandbox).
-     *
-     * @since  1.0.0
-     * @var string $test_public_key
-     */
-    protected $test_public_key = '';
+    protected $private_key = '';
 
     /**
      * 2Checkout public key (live).
      *
      * @since  1.0.0
-     * @var string $live_public_key
+     * @var string $publishable_key
      */
-    protected $live_public_key = '';
+    protected $publishable_key = '';
     /**
      * Option key used for saving 2Checkout subscription data
      * 
@@ -145,7 +127,7 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
             //@todo : Refactor to seperate class
             $verification_url = 'https://api.two_checkout.co/transaction/verify/' . $transaction_ref;
             $headers = array(
-                'Authorization' => 'Bearer ' . $this->get_secret_key(),
+                'Authorization' => 'Bearer ' . $this->private_key(),
             );
             $args = array(
                 'headers'   => $headers,
@@ -213,7 +195,7 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         $input = @file_get_contents("php://input");
 
         // validate event do all at once to avoid timing attack
-        if ($_SERVER['HTTP_X_2Checkout_SIGNATURE'] !== hash_hmac('sha512', $input, $this->get_secret_key())) {
+        if ($_SERVER['HTTP_X_2Checkout_SIGNATURE'] !== hash_hmac('sha512', $input, $this->private_key())) {
             exit();
         }
 
@@ -309,8 +291,8 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
      * @return boolean True if configured.
      */
     public function is_configured() {
-        $key_pub = $this->get_public_key();
-        $key_sec = $this->get_secret_key();
+        $key_pub = $this->publishable_key();
+        $key_sec = $this->private_key();
 
         $is_configured = ! ( empty( $key_pub ) || empty( $key_sec ) );
 
@@ -328,17 +310,13 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
      *
      * @return string The two_checkout API publishable key.
      */
-    public function get_public_key() {
+    public function publishable_key() {
         $public_key = null;
+        $public_key = $this->publishable_key;
 
-        if ( $this->is_live_mode() ) {
-            $public_key = $this->live_public_key;
-        } else {
-            $public_key = $this->test_public_key;
-        }
 
         return apply_filters(
-            'ms_gateway_two_checkout_get_public_key',
+            'ms_gateway_two_checkout_publishable_key',
             $public_key
         );
     }
@@ -367,17 +345,13 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
      *
      * @return string The two_checkout API secret key.
      */
-    public function get_secret_key() {
+    public function private_key() {
         $secret_key = null;
 
-        if ( $this->is_live_mode() ) {
-            $secret_key = $this->live_secret_key;
-        } else {
-            $secret_key = $this->test_secret_key;
-        }
-
+        $secret_key = $this->private_key;
+        
         return apply_filters(
-            'ms_gateway_two_checkout_get_secret_key',
+            'ms_gateway_two_checkout_private_key',
             $secret_key
         );
     }

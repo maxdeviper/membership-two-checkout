@@ -7,7 +7,7 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 		$gateway = $this->data['model'];
 
 		$msg = '<em>'.__(
-			"@Checkout Forms API KEYS Settings!\n Your webhook URL is: http://www.ibiene.com/ms-payment-return/".MS_Gateway_Two_Checkout::ID, 'membership-two-checkout'
+			"2Checkout Forms API KEYS Settings!\n Your webhook URL is: http://www.ibiene.com/ms-payment-return/".MS_Gateway_Two_Checkout::ID, 'membership-two-checkout'
 		) .
 		'</em>';
 
@@ -44,38 +44,21 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 				'ajax_data' => array( 1 ),
 			),
 
-			'test_secret_key' => array(
-				'id' => 'test_secret_key',
-				'title' => __( 'API Test Secret Key', 'membership-two-checkout' ),
+
+			'private_key' => array(
+				'id' => 'private_key',
+				'title' => __( 'API Private Key', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
-				'value' => $gateway->test_secret_key,
+				'value' => $gateway->private_key,
 				'class' => 'ms-text-large',
 				'ajax_data' => array( 1 ),
 			),
 
-			'test_public_key' => array(
-				'id' => 'test_public_key',
-				'title' => __( 'API Test Public Key', 'membership-two-checkout' ),
+			'publishable_key' => array(
+				'id' => 'publishable_key',
+				'title' => __( 'API Publishable Key', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
-				'value' => $gateway->test_public_key,
-				'class' => 'ms-text-large',
-				'ajax_data' => array( 1 ),
-			),
-
-			'live_secret_key' => array(
-				'id' => 'live_secret_key',
-				'title' => __( 'API Live Secret Key', 'membership-two-checkout' ),
-				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
-				'value' => $gateway->live_secret_key,
-				'class' => 'ms-text-large',
-				'ajax_data' => array( 1 ),
-			),
-
-			'live_public_key' => array(
-				'id' => 'live_public_key',
-				'title' => __( 'API Live Public Key', 'membership-two-checkout' ),
-				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
-				'value' => $gateway->live_public_key,
+				'value' => $gateway->publishable_key,
 				'class' => 'ms-text-large',
 				'ajax_data' => array( 1 ),
 			),

@@ -20,16 +20,16 @@ function two_checkout_register( $api ) {
  	$api->register_payment_gateway( MS_Gateway_Two_Checkout::ID, 'MS_Gateway_two_checkout' );
 }
 
-function set_to_naira($default, $invoice){
+function two_checkout_set_to_naira($default, $invoice){
 
 	return 'NGN';
 }
-function convert_to_kobo($amount, $invoice)
+function two_checkout_convert_to_kobo($amount, $invoice)
 {
 	return ceil(abs( $amount * 100 ));
 }
 
-function two_checkout_subscription_code($membership_tab_payment_view, $membership)
+function two_checkout_membership_form($membership_tab_payment_view, $membership)
 {
 	// $html = '';
 	// $gateways = MS_Model_Gateway::get_gateways();
@@ -89,7 +89,7 @@ function two_checkout_subscription_code($membership_tab_payment_view, $membershi
 	}
 }
 
-function add_two_checkout_subscription_code()
+function add_two_checkout_plan_code()
 { 
         //options fields for each membership 
 	$fields = [
@@ -143,7 +143,7 @@ function add_two_checkout_subscription_code()
  * @param array $periods an array of periods for membership payment period
  * @return array
  */
-function add_payments_period($periods) {
+function two_checkout_add_payments_period($periods) {
     $periods['hours'] = __('hours', 'membership-two-checkout');
     return $periods;
 }
@@ -164,13 +164,13 @@ function add_payments_period($periods) {
  *
  * 
  */
-add_filter( 'ms_gateway_two_checkout_currency_to_use', 'set_to_naira',10, 2 );
+add_filter( 'ms_gateway_two_checkout_currency_to_use', 'two_checkout_set_to_naira',10, 2 );
 add_filter( 'ms_gateway_two_checkout_amount_to_use', 'convert_to_kobo',10, 2 );
 add_action( 'ms_init', 'two_checkout_register' );
-add_action('ms_view_membership_tab_payment_form', 'two_checkout_subscription_code', 10, 2);
+add_action('ms_view_membership_tab_payment_form', 'two_checkout_membership_form', 10, 2);
 // add_filter('ms_view_membership_tab_payment_fields', 'two_checkout_membership_field',10, 1);
 // 
-add_action('wp_ajax_update_membership', 'add_two_checkout_subscription_code');
+add_action('wp_ajax_update_membership', 'add_two_checkout_plan_code');
 
 /**
  * filter for adding custom payment periods
