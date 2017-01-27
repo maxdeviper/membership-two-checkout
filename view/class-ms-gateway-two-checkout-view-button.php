@@ -78,7 +78,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
             ?>
         ></script>
 		<form id="membership-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
-            
+
             <input type='hidden' name='quantity' value='1'>
             <input type='hidden' name='product_id' value='1'>
 			<?php
@@ -158,11 +158,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'id' => 'ms_relationship_id',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $subscription->id,
-			),
-			'step' => array(
-				'id' => 'step',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => $this->data['step'],
 			),
 		);
 
