@@ -178,7 +178,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_SUBMIT,
 				'value' => $gateway->pay_button_url
 					? $gateway->pay_button_url
-					: __( 'Pay with 2Checkout', 'membership-two-checkout' ),
+					: __( 'Signup using 2Checkout', 'membership-two-checkout' ),
 			);
 		}
 
