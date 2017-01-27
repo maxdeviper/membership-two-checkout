@@ -37,17 +37,17 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
                 // add subscription data to two_checkout. To be used for accessing user's membership2 subscription
                 $metadata = array(
                   'custom_fields' => array(
-                      array(                          
+                      array(
                         "display_name" => "Subscription_ID",
                         "variable_name" => "subscription_id",
                         "value" => $subscription->id,
                       ),
-                      array(                          
+                      array(
                         "display_name" => "Member_ID",
                         "variable_name" => "member_id",
                         "value" => $member->id,
                       )
-                  )  
+                  )
                 );
 		$two_checkout_data['metadata'] = json_encode($metadata);
 		$two_checkout_data['plan'] = get_option( MS_Gateway_Two_Checkout::TWO_CHECKOUT_OPTION_KEY)[$subscription->get_membership()->id]['code'] ;
@@ -65,39 +65,27 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 		ob_start();
 		?>
 		<form id="membership-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
+
+
+			<input type='hidden' name='mode' value='2CO' />
+			<input type='hidden' name='li_0_type' value='product' />
+			<input type='hidden' name='li_0_name' value='invoice123' />
+			<input type='hidden' name='li_0_price' value='25.99' />
+			<input type='hidden' name='card_holder_name' value='Checkout Shopper' />
+			<input type='hidden' name='street_address' value='123 Test Address' />
+			<input type='hidden' name='street_address2' value='Suite 200' />
+			<input type='hidden' name='city' value='Columbus' />
+			<input type='hidden' name='state' value='OH' />
+			<input type='hidden' name='zip' value='43228' />
+			<input type='hidden' name='country' value='USA' />
+			<input type='hidden' name='email' value='example@2co.com' />
+			<input type='hidden' name='phone' value='614-921-2450' />
 			<?php
 				foreach ( $fields as $field ) {
 					MS_Helper_Html::html_element( $field );
 				}
 			?>
-            <form action='' method='post'>
-                <input type='hidden' name='sid' value='1303908' />
-                <input type='hidden' name='mode' value='2CO' />
-                <input type='hidden' name='li_0_type' value='product' />
-                <input type='hidden' name='li_0_name' value='invoice123' />
-                <input type='hidden' name='li_0_price' value='25.99' />
-                <input type='hidden' name='li_0_tangible' value='N' />
-                <input type='hidden' name='li_1_type' value='shipping' />
-                <input type='hidden' name='li_1_name' value='Express Shipping' />
-                <input type='hidden' name='li_1_price' value='13.99' />
-                <input type='hidden' name='card_holder_name' value='Checkout Shopper' />
-                <input type='hidden' name='street_address' value='123 Test Address' />
-                <input type='hidden' name='street_address2' value='Suite 200' />
-                <input type='hidden' name='city' value='Columbus' />
-                <input type='hidden' name='state' value='OH' />
-                <input type='hidden' name='zip' value='43228' />
-                <input type='hidden' name='country' value='USA' />
-                <input type='hidden' name='ship_name' value='Checkout Shopper' />
-                <input type='hidden' name='ship_street_address' value='123 Test Address' />
-                <input type='hidden' name='ship_street_address2' value='Suite 200' />
-                <input type='hidden' name='ship_city' value='Columbus' />
-                <input type='hidden' name='ship_state' value='OH' />
-                <input type='hidden' name='ship_zip' value='43228' />
-                <input type='hidden' name='ship_country' value='USA' />
-                <input type='hidden' name='email' value='example@2co.com' />
-                <input type='hidden' name='phone' value='614-921-2450' />
-                <input name='submit' type='submit' value='Checkout' />
-            </form>
+				<input name='submit' type='submit' value='Checkout' />
         <script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
 
 			<?php
@@ -172,6 +160,11 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $this->data['step'],
 			),
+			'sid' => array(
+				'id' => 'sid',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => $gateway->get_seller_id(),
+			),
 		);
 
 		if ( false !== strpos( $gateway->pay_button_url, '://' ) ) {
@@ -183,11 +176,10 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 		} else {
 			$fields['button'] = array(
 				'id' => 'submit-payment',
-				'type' => MS_Helper_Html::INPUT_TYPE_BUTTON,
+				'type' => MS_Helper_Html::INPUT_TYPE_SUBMIT,
 				'value' => $gateway->pay_button_url
 					? $gateway->pay_button_url
-					: __( 'Signup', 'membership-two-checkout' ),
-				'onclick' => 'payWithTwoCheckout()',
+					: __( 'Pay with 2Checkout', 'membership-two-checkout' ),
 			);
 		}
 

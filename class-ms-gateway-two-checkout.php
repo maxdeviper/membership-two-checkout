@@ -50,6 +50,7 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
      */
     protected $private_key = '';
 
+    protected $seller_id = '';
     /**
      * 2Checkout public key (live).
      *
@@ -315,6 +316,11 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
             'ms_gateway_public_is_configured',
             $is_configured
         );
+    }
+
+    public function get_seller_id()
+    {
+       return $this->seller_id;
     }
 
     /**
