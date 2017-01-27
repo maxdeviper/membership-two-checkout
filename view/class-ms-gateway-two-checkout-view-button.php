@@ -78,9 +78,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
             ?>
         ></script>
 		<form id="membership-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
-
-
-			<input type='hidden' name='mode' value='2CO' />
+            
             <input type='hidden' name='quantity' value='1'>
             <input type='hidden' name='product_id' value='1'>
 			<?php
