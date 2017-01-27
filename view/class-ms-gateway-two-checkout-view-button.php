@@ -85,7 +85,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 					MS_Helper_Html::html_element( $field );
 				}
 			?>
-				<input name='submit' type='submit' value='Checkout' />
         <script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
 
 			<?php
