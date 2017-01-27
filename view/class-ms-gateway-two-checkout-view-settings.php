@@ -58,9 +58,9 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 				'title' => __( 'API Private Key', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
 				'value' => $gateway->private_key,
-			),
 				'class' => 'ms-text-large',
 				'ajax_data' => array( 1 ),
+			),
 
 			'publishable_key' => array(
 				'id' => 'publishable_key',
