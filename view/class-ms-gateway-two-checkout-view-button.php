@@ -81,8 +81,8 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 
 
 			<input type='hidden' name='mode' value='2CO' />
-			<input type='hidden' name='li_0_type' value='product' />
-			<input type='hidden' name='li_0_name' value='invoice123' />
+            <input type='hidden' name='quantity' value='1'>
+            <input type='hidden' name='product_id' value='1'>
 			<input type='hidden' name='card_holder_name' value='Checkout Shopper' />
 			<input type='hidden' name='street_address' value='123 Test Address' />
 			<input type='hidden' name='street_address2' value='Suite 200' />
