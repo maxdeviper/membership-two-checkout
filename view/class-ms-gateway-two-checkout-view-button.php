@@ -64,6 +64,19 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 		);
 		ob_start();
 		?>
+
+        <script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
+
+            <?php
+            // foreach ( $two_checkout_data as $key => $value ) {
+            // 	printf(
+            // 		'data-%s="%s" ',
+            // 		esc_attr( $key ),
+            // 		esc_attr( $value )
+            // 	);
+            // }
+            ?>
+        ></script>
 		<form id="membership-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
 
 
@@ -84,18 +97,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 					MS_Helper_Html::html_element( $field );
 				}
 			?>
-        <script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
-
-			<?php
-				 // foreach ( $two_checkout_data as $key => $value ) {
-				 // 	printf(
-				 // 		'data-%s="%s" ',
-				 // 		esc_attr( $key ),
-				 // 		esc_attr( $value )
-				 // 	);
-				 // }
-			?>
-		></script>
 		</form>
 
 		<?php
@@ -139,11 +140,30 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
         $invoice = $subscription->get_current_invoice();
 
 		$fields = array(
-
+			'_wpnonce' => array(
+				'id' => '_wpnonce',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => wp_create_nonce( "{$gateway->id}_{$subscription->id}" ),
+			),
+			'gateway' => array(
+				'id' => 'gateway',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => $gateway->id,
+			),
             'price' => array(
 				'id' => 'li_0_price',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $invoice->total,
+			),
+			'ms_relationship_id' => array(
+				'id' => 'ms_relationship_id',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => $subscription->id,
+			),
+			'step' => array(
+				'id' => 'step',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => $this->data['step'],
 			),
 			'sid' => array(
 				'id' => 'sid',
