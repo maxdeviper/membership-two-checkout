@@ -70,7 +70,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 			<input type='hidden' name='mode' value='2CO' />
 			<input type='hidden' name='li_0_type' value='product' />
 			<input type='hidden' name='li_0_name' value='invoice123' />
-			<input type='hidden' name='li_0_price' value='25.99' />
 			<input type='hidden' name='card_holder_name' value='Checkout Shopper' />
 			<input type='hidden' name='street_address' value='123 Test Address' />
 			<input type='hidden' name='street_address2' value='Suite 200' />
@@ -137,27 +136,14 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 	private function prepare_fields() {
 		$gateway = $this->data['gateway'];
 		$subscription = $this->data['ms_relationship'];
+        $invoice = $subscription->get_current_invoice();
 
 		$fields = array(
-			'_wpnonce' => array(
-				'id' => '_wpnonce',
+
+            'price' => array(
+				'id' => 'li_0_price',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => wp_create_nonce( "{$gateway->id}_{$subscription->id}" ),
-			),
-			'gateway' => array(
-				'id' => 'gateway',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => $gateway->id,
-			),
-			'ms_relationship_id' => array(
-				'id' => 'ms_relationship_id',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => $subscription->id,
-			),
-			'step' => array(
-				'id' => 'step',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => $this->data['step'],
+				'value' => $invoice->total,
 			),
 			'sid' => array(
 				'id' => 'sid',
