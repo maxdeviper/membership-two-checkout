@@ -65,7 +65,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 		ob_start();
 		?>
 
-        <script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
+        //<script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
 
             <?php
             // foreach ( $two_checkout_data as $key => $value ) {
@@ -79,13 +79,16 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
         ></script>
 		<form id="membership-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
 
-            <input type='hidden' name='quantity' value='1'>
-            <input type='hidden' name='product_id' value='1'>
+
+
 			<?php
 				foreach ( $fields as $field ) {
 					MS_Helper_Html::html_element( $field );
 				}
 			?>
+            <input type='hidden' name='li_0_type' value='product' />
+            <input type='hidden' name='li_0_name' value='Monthly Subscription' />
+            <input type='hidden' name='li_0_recurrence' value='1 Month' />
 		</form>
 
 		<?php
