@@ -12,7 +12,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 		//$action_url = MS_Model_Pages::get_page_url( MS_Model_Pages::MS_PAGE_REGISTER );
 		$action_url = apply_filters(
 			'ms_gateway_two_checkout_view_button_form_action_url',
-			'https://www.2checkout.com/checkout/purchase' //$action_url
+			$gateway->get_checkout_url() //$action_url
 		);
 
 		$row_class = 'gateway_' . $gateway->id;
@@ -56,8 +56,8 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 		$two_checkout_data['ref'] = apply_filters( 'ms_gateway_two_checkout_get_transaction_ref', mt_rand(1000,9999));
 		$two_checkout_data['amount'] = apply_filters( 'ms_gateway_two_checkout_amount_to_use', $invoice->total, $invoice); // Amount in kobo.
 
-                
-        $two_checkout_data = apply_filters(
+
+		$two_checkout_data = apply_filters(
 			'ms_gateway_two_checkout_form_details_after',
 			$two_checkout_data,
 			$invoice
@@ -76,7 +76,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
                 <input type='hidden' name='li_0_type' value='product' />
                 <input type='hidden' name='li_0_name' value='invoice123' />
                 <input type='hidden' name='li_0_price' value='25.99' />
-                <input type='hidden' name='li_0_tangible' value='Y' />
+                <input type='hidden' name='li_0_tangible' value='N' />
                 <input type='hidden' name='li_1_type' value='shipping' />
                 <input type='hidden' name='li_1_name' value='Express Shipping' />
                 <input type='hidden' name='li_1_price' value='13.99' />
@@ -111,34 +111,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 			?>
 		></script>
 		</form>
-			 
-		<script>
-		  function payWithTwoCheckout(){
-		    var handler = two_checkoutPop.setup({
-		      key: '<?php echo $two_checkout_data['key']; ?>',
-		      email: '<?php echo $two_checkout_data['email']; ?>',
-		      plan: '<?php echo $two_checkout_data['plan']; ?>',
-		      currency: '<?php echo $two_checkout_data['currency']; ?>',
-		      amount: <?php echo $two_checkout_data['amount']; ?>,
-		      ref: '<?php echo $two_checkout_data['ref']; ?>',
-		      metadata: <?php echo $two_checkout_data['metadata']; ?>,
-		      callback: function(response){
-		          var form = document.getElementById('membership-form');
-		          var input = document.createElement("input");
-		          input.setAttribute('type', 'hidden');
-		          input.setAttribute('name', 'transaction_ref');
-		          input.setAttribute('value', response.reference);
-		          form.appendChild(input);
-		          form.submit();
-		      },
-		      onClose: function(){
-		         
-		      }
-		    });
-		    handler.openIframe();
-		  }
-		  document.getElementById('submit-payment').addEventListener("click", payWithTwoCheckout);
-		</script>
+
 		<?php
 		$payment_form = apply_filters(
 			'ms_gateway_form',

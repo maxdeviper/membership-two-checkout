@@ -233,13 +233,13 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
                  break;
             case 'subscription.disable':
                 $notes = __('Customer 2Checkout Subscription disabled', 'membership-two-checkout');
-                $subscription->set_status(MS_Model_Relationship::STATUS_CANCELED);
+                $subscription->status = MS_Model_Relationship::STATUS_CANCELED;
                 $subscription->save();
 
                 $success = true;
                 break;
             case 'subscription.enable':
-                $subscription->set_status(MS_Model_Relationship::STATUS_ACTIVE);
+                $subscription->status = MS_Model_Relationship::STATUS_ACTIVE;
                 $subscription->save();
                 $notes = __('Customer 2Checkout Subscription enabled', 'membership-two-checkout');
 
@@ -282,6 +282,21 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
 		);
     }
 
+    public function get_checkout_url()
+    {
+        $url = null;
+
+        if ( $this->is_live_mode() ) {
+            $url = self::LIVE_CHECKOUT_URL;
+        } else {
+            $url = self::SANDBOX_CHECKOUT_URL;
+        }
+
+        return apply_filters(
+            'ms_gateway_two_checkout_get_url',
+            $url
+        );
+    }
     /**
      * Verify required fields.
      *
@@ -349,7 +364,7 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         $secret_key = null;
 
         $secret_key = $this->private_key;
-        
+
         return apply_filters(
             'ms_gateway_two_checkout_private_key',
             $secret_key
