@@ -186,6 +186,7 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         $subscription_id = 0;
         $invoice_id = 0;
         $ignore = false;
+        die(var_dump($_REQUEST));
         
         // only a post with 2Checkout signature header gets our attention
         if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST' ) || !array_key_exists('HTTP_X_2Checkout_SIGNATURE', $_SERVER)) {
