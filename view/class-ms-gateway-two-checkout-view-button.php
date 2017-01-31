@@ -65,7 +65,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 		ob_start();
 		?>
 
-        //<script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
+        <!-- <script src="https://www.2checkout.com/static/checkout/javascript/direct.min.js"
 
             <?php
             // foreach ( $two_checkout_data as $key => $value ) {
@@ -76,7 +76,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
             // 	);
             // }
             ?>
-        ></script>
+        ></script> -->
 		<form id="membership-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
 
 
