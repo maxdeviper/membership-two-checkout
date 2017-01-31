@@ -166,8 +166,8 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => '1 Month',
 			),
-			'li_#_tangible' => array(
-				'id' => 'li_#_tangible',
+			'li_0_tangible' => array(
+				'id' => 'li_0_tangible',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => 'N',
 			),
