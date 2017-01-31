@@ -86,7 +86,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 					MS_Helper_Html::html_element( $field );
 				}
 			?>
-            <input type='hidden' name='li_0_type' value='product' />
             <input type='hidden' name='li_0_name' value='Monthly Subscription' />
             <input type='hidden' name='li_0_recurrence' value='1 Month' />
 		</form>
@@ -148,9 +147,29 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'value' => '2CO',
 			),
 			'gateway' => array(
+				'id' => 'product',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => 'product',
+			),
+			'li_0_type' => array(
 				'id' => 'gateway',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $gateway->id,
+			),
+			'li_0_name' => array(
+				'id' => 'li_0_name',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => 'Monthly Subscription',
+			),
+			'li_0_recurrence' => array(
+				'id' => 'li_0_recurrence',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => '1 Month',
+			),
+			'li_#_tangible' => array(
+				'id' => 'li_#_tangible',
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'value' => 'N',
 			),
             'price' => array(
 				'id' => 'li_0_price',
