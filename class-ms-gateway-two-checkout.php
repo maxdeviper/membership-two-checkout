@@ -16,6 +16,7 @@ $loader = new MS_Loader();
 
 require_once plugin_dir_path( __FILE__ ).'view/class-ms-gateway-two-checkout-view-button.php';
 require_once plugin_dir_path( __FILE__ ).'view/class-ms-gateway-two-checkout-view-settings.php';
+require_once plugin_dir_path( __FILE__ ).'lib/2checkout/lib/Twocheckout.php';
 
 class MS_Gateway_Two_Checkout extends MS_Gateway
 {
@@ -23,6 +24,8 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
     const ID = 'two_checkout';
     const SANDBOX_CHECKOUT_URL = 'https://sandbox.2checkout.com/checkout/purchase';
     const LIVE_CHECKOUT_URL = 'https://www.2checkout.com/checkout/purchase';
+    const HASH_RESPONSE_CODE = 'Success';
+    const HASH_RESPONSE_MESSAGE = 'Hash Matched';
 
     /**
      * Gateway singleton instance.
@@ -236,23 +239,24 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         $subscription_id = 0;
         $invoice_id = 0;
         $ignore = false;
-        die(var_dump($_REQUEST));
         
         // only a post with 2Checkout signature header gets our attention
-        if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST' ) || !array_key_exists('HTTP_X_2Checkout_SIGNATURE', $_SERVER)) {
-            exit();
+        $params = array();
+        foreach ($_REQUEST as $k => $v) {
+            $params[$k] = $v;
         }
 
-        // Retrieve the request's body
-        $input = @file_get_contents("php://input");
-
-        // validate event do all at once to avoid timing attack
-        if ($_SERVER['HTTP_X_2Checkout_SIGNATURE'] !== hash_hmac('sha512', $input, $this->private_key())) {
-            exit();
+        $passback = Twocheckout_Return::check($params, $this->secret_word());
+        if(strcasecmp($passback['response_code'], self::HASH_RESPONSE_CODE) != 0
+            &&
+            strcasecmp($passback['response_message'], self::HASH_RESPONSE_MESSAGE) != 0
+        ){
+            http_response_code(404);
+            die('Hash Incorrect');
         }
-
         http_response_code(200);
-
+        error_log(print_r($_REQUEST, true));
+        die();
         // parse event (which is json string) as object
         // Do something - that will not take long - with $event
         $response = json_decode($input);
