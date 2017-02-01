@@ -171,17 +171,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => 'N',
 			),
-			'currency_code' => array(
-				'id' => 'currency_code',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => $invoice->currency,
-			),
-			// @todo: should be removed  or determine using gateway mode
-			'demo' => array(
-				'id' => 'demo',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => 'Y',
-			),
+
             'price' => array(
 				'id' => 'li_0_price',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
