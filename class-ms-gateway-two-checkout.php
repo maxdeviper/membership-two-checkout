@@ -387,6 +387,22 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         );
     }
 
+    /**
+     * Propagate membership cancelation to the gateway.
+     *
+     * Overridden in child classes.
+     *
+     * @since  1.0.0
+     * @param MS_Model_Relationship $subscription The membership relationship.
+     */
+    public function cancel_membership( $subscription ) {
+        do_action(
+            'ms_gateway_cancel_membership',
+            $subscription,
+            $this
+        );
+    }
+
     public function secret_word()
     {
         $secret_word = null;
@@ -400,6 +416,29 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         return apply_filters(
             'ms_gateway_two_checkout_get_seller_id',
             $secret_word
+        );
+    }
+
+    /**
+     * Get two_checkout private key.
+     *
+     * @since  1.0.0
+     * @internal The private key should not be used outside this object!
+     *
+     * @return string The two_checkout API secret key.
+     */
+    public function private_key() {
+        $private_key = null;
+
+        if ( $this->is_live_mode() ) {
+            $private_key = $this->private_key;
+        } else {
+            $private_key = $this->test_private_key;
+        }
+
+        return apply_filters(
+            'ms_gateway_two_checkout_get_private_key',
+            $private_key
         );
     }
 
@@ -423,45 +462,6 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         return apply_filters(
             'ms_gateway_two_checkout_get_publishable_key',
             $publishable_key
-        );
-    }
-
-    /**
-     * Propagate membership cancelation to the gateway.
-     *
-     * Overridden in child classes.
-     *
-     * @since  1.0.0
-     * @param MS_Model_Relationship $subscription The membership relationship.
-     */
-    public function cancel_membership( $subscription ) {
-            do_action(
-                    'ms_gateway_cancel_membership',
-                    $subscription,
-                    $this
-            );
-    }
-
-    /**
-     * Get two_checkout private key.
-     *
-     * @since  1.0.0
-     * @internal The private key should not be used outside this object!
-     *
-     * @return string The two_checkout API secret key.
-     */
-    public function private_key() {
-        $private_key = null;
-
-        if ( $this->is_live_mode() ) {
-            $private_key = $this->private_key;
-        } else {
-            $private_key = $this->test_private_key;
-        }
-
-        return apply_filters(
-            'ms_gateway_two_checkout_get_private_key',
-            $private_key
         );
     }
 

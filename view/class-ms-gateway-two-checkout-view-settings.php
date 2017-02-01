@@ -52,7 +52,7 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
                 'class' => 'ms-text-large',
                 'ajax_data' => array( 1 ),
             ),
-            
+
 			'test_secret_word' => array(
 				'id' => 'test_secret_word',
 				'title' => __( 'Sandbox Secret Word', 'membership-two-checkout' ),
@@ -63,8 +63,8 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 			),
 
 
-			'sandbox_private_key' => array(
-				'id' => 'sandbox_private_key',
+			'test_private_key' => array(
+				'id' => 'test_private_key',
 				'title' => __( 'Sandbox API Private Key', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
 				'value' => $gateway->test_private_key,
@@ -73,7 +73,7 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 			),
 
 			'sandbox_publishable_key' => array(
-				'id' => 'sandbox_publishable_key',
+				'id' => 'test_publishable_key',
 				'title' => __( 'Sandbox API Publishable Key', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
 				'value' => $gateway->test_publishable_key,
