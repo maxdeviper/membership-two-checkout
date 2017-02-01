@@ -139,7 +139,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
             'sid' => array(
                 'id' => 'sid',
                 'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-                'value' => $gateway->get_seller_id(),
+                'value' => $gateway->seller_id(),
             ),
 			'mode' => array(
 				'id' => 'mode',
