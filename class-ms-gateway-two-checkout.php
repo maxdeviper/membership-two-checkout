@@ -43,6 +43,40 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
     protected $payment_info;
 
     /**
+     * 2Checkout Secret word (Live).
+     *
+     *
+     * @since  1.0.0
+     * @var string $secret_word
+     */
+    protected $secret_word;
+
+    /**
+     * 2Checkout Secret word (Sandbox).
+     *
+     *
+     * @since  1.0.0
+     * @var string $test_secret_word
+     */
+    protected $test_secret_word;
+
+    /**
+     * 2Checkout Secret key (sandbox).
+     *
+     * @since  1.0.0
+     * @var string $test_private_key
+     */
+    protected $test_private_key = '';
+
+    /**
+     * 2Checkout public key (sandbox).
+     *
+     * @since  1.0.0
+     * @var string $test_publishable_key
+     */
+    protected $test_publishable_key = '';
+
+    /**
      * 2Checkout Secret key (live).
      *
      * @since  1.0.0
@@ -50,7 +84,6 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
      */
     protected $private_key = '';
 
-    protected $seller_id = '';
     /**
      * 2Checkout public key (live).
      *
@@ -58,6 +91,23 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
      * @var string $publishable_key
      */
     protected $publishable_key = '';
+
+    /**
+     * 2Checkout seller id (sandbox).
+     *
+     * @var string $test_seller_id
+     *
+     */
+    protected $test_seller_id = '';
+
+    /**
+     * 2Checkout seller id (live).
+     *
+     * @var string $seller_id
+     *
+     */
+    protected $seller_id = '';
+
     /**
      * Option key used for saving 2Checkout subscription data
      * 
@@ -310,8 +360,10 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
     public function is_configured() {
         $key_pub = $this->publishable_key();
         $key_sec = $this->private_key();
+        $seller_id = $this->seller_id();
+        $secret_word = $this->secret_word();
 
-        $is_configured = ! ( empty( $key_pub ) || empty( $key_sec ) );
+        $is_configured = ! ( empty( $key_pub ) || empty( $key_sec ) || empty($seller_id ) || empty($secret_word));
 
         return apply_filters(
             'ms_gateway_public_is_configured',
@@ -319,9 +371,36 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         );
     }
 
-    public function get_seller_id()
+    public function seller_id()
     {
-       return $this->seller_id;
+        $seller_id = null;
+
+        if ( $this->is_live_mode() ) {
+            $seller_id = $this->seller_id;
+        } else {
+            $seller_id = $this->test_seller_id;
+        }
+
+        return apply_filters(
+            'ms_gateway_two_checkout_get_seller_id',
+            $seller_id
+        );
+    }
+
+    public function secret_word()
+    {
+        $secret_word = null;
+
+        if ( $this->is_live_mode() ) {
+            $secret_word = $this->secret_word;
+        } else {
+            $secret_word = $this->test_secret_word;
+        }
+
+        return apply_filters(
+            'ms_gateway_two_checkout_get_seller_id',
+            $secret_word
+        );
     }
 
     /**
@@ -333,13 +412,17 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
      * @return string The two_checkout API publishable key.
      */
     public function publishable_key() {
-        $public_key = null;
-        $public_key = $this->publishable_key;
+        $publishable_key = null;
 
+        if ( $this->is_live_mode() ) {
+            $publishable_key = $this->publishable_key;
+        } else {
+            $publishable_key = $this->test_publishable_key;
+        }
 
         return apply_filters(
-            'ms_gateway_two_checkout_publishable_key',
-            $public_key
+            'ms_gateway_two_checkout_get_publishable_key',
+            $publishable_key
         );
     }
 
@@ -360,21 +443,25 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
     }
 
     /**
-     * Get two_checkout secret key.
+     * Get two_checkout private key.
      *
      * @since  1.0.0
-     * @internal The secret key should not be used outside this object!
+     * @internal The private key should not be used outside this object!
      *
      * @return string The two_checkout API secret key.
      */
     public function private_key() {
-        $secret_key = null;
+        $private_key = null;
 
-        $secret_key = $this->private_key;
+        if ( $this->is_live_mode() ) {
+            $private_key = $this->private_key;
+        } else {
+            $private_key = $this->test_private_key;
+        }
 
         return apply_filters(
-            'ms_gateway_two_checkout_private_key',
-            $secret_key
+            'ms_gateway_two_checkout_get_private_key',
+            $private_key
         );
     }
 

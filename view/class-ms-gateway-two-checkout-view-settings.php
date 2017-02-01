@@ -44,18 +44,65 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 				'ajax_data' => array( 1 ),
 			),
 
-			'seller_id' => array(
-				'id' => 'seller_id',
-				'title' => __( 'Seller ID', 'membership-two-checkout' ),
+            'test_seller_id' => array(
+                'id' => 'test_seller_id',
+                'title' => __( 'Sandbox Seller ID', 'membership-two-checkout' ),
+                'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
+                'value' => $gateway->test_seller_id,
+                'class' => 'ms-text-large',
+                'ajax_data' => array( 1 ),
+            ),
+            
+			'test_secret_word' => array(
+				'id' => 'test_secret_word',
+				'title' => __( 'Sandbox Secret Word', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
-				'value' => $gateway->get_seller_id(),
+				'value' => $gateway->test_secret_word,
 				'class' => 'ms-text-large',
 				'ajax_data' => array( 1 ),
 			),
 
+
+			'sandbox_private_key' => array(
+				'id' => 'sandbox_private_key',
+				'title' => __( 'Sandbox API Private Key', 'membership-two-checkout' ),
+				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
+				'value' => $gateway->test_private_key,
+				'class' => 'ms-text-large',
+				'ajax_data' => array( 1 ),
+			),
+
+			'sandbox_publishable_key' => array(
+				'id' => 'sandbox_publishable_key',
+				'title' => __( 'Sandbox API Publishable Key', 'membership-two-checkout' ),
+				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
+				'value' => $gateway->test_publishable_key,
+				'class' => 'ms-text-large',
+				'ajax_data' => array( 1 ),
+			),
+
+			'seller_id' => array(
+				'id' => 'seller_id',
+				'title' => __( 'Live Seller ID', 'membership-two-checkout' ),
+				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
+				'value' => $gateway->seller_id,
+				'class' => 'ms-text-large',
+				'ajax_data' => array( 1 ),
+			),
+
+			'secret_word' => array(
+				'id' => 'secret_word',
+				'title' => __( 'Live Secret Word', 'membership-two-checkout' ),
+				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
+				'value' => $gateway->secret_word,
+				'class' => 'ms-text-large',
+				'ajax_data' => array( 1 ),
+			),
+
+
 			'private_key' => array(
 				'id' => 'private_key',
-				'title' => __( 'API Private Key', 'membership-two-checkout' ),
+				'title' => __( 'Live API Private Key', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
 				'value' => $gateway->private_key,
 				'class' => 'ms-text-large',
@@ -64,7 +111,7 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 
 			'publishable_key' => array(
 				'id' => 'publishable_key',
-				'title' => __( 'API Publishable Key', 'membership-two-checkout' ),
+				'title' => __( 'Live API Publishable Key', 'membership-two-checkout' ),
 				'type' => MS_Helper_Html::INPUT_TYPE_TEXT,
 				'value' => $gateway->publishable_key,
 				'class' => 'ms-text-large',
