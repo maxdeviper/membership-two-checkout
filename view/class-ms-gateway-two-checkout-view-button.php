@@ -108,11 +108,11 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $membership->name,
 			),
-			'recurrence' => array(
-				'id' => 'li_0_recurrence',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => '1 Month',
-			),
+			// 'recurrence' => array(
+			// 	'id' => 'li_0_recurrence',
+			// 	'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+			// 	'value' => '1 Month',
+			// ),
 			'tangible' => array(
 				'id' => 'li_0_tangible',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
