@@ -14,54 +14,15 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 			'ms_gateway_two_checkout_view_button_form_action_url',
 			$gateway->get_checkout_url() //$action_url
 		);
+		if ( 0 === $invoice->total ) {
+			$action_url = null;
+		}
 
 		$row_class = 'gateway_' . $gateway->id;
 		if ( ! $gateway->is_live_mode() ) {
 			$row_class .= ' sandbox-mode';
 		}
-		/**
-		 * Users can change details (like the title or description) of the
-		 * 2Checkout checkout popup.
-		 *
-		 * @since  1.0.0
-		 * @var array
-		 */
-		$two_checkout_data = array();
-		$two_checkout_data = apply_filters(
-			'ms_gateway_two_checkout_form_details',
-			$two_checkout_data,
-			$invoice
-		);
-
-		$two_checkout_data['email'] = $member->email;
-                // add subscription data to two_checkout. To be used for accessing user's membership2 subscription
-                $metadata = array(
-                  'custom_fields' => array(
-                      array(
-                        "display_name" => "Subscription_ID",
-                        "variable_name" => "subscription_id",
-                        "value" => $subscription->id,
-                      ),
-                      array(
-                        "display_name" => "Member_ID",
-                        "variable_name" => "member_id",
-                        "value" => $member->id,
-                      )
-                  )
-                );
-		$two_checkout_data['metadata'] = json_encode($metadata);
-		$two_checkout_data['plan'] = get_option( MS_Gateway_Two_Checkout::TWO_CHECKOUT_OPTION_KEY)[$subscription->get_membership()->id]['code'] ;
-		$two_checkout_data['key'] = $gateway->publishable_key();
-		$two_checkout_data['currency'] = apply_filters( 'ms_gateway_two_checkout_currency_to_use', 'NGN', $invoice);
-		$two_checkout_data['ref'] = apply_filters( 'ms_gateway_two_checkout_get_transaction_ref', mt_rand(1000,9999));
-		$two_checkout_data['amount'] = apply_filters( 'ms_gateway_two_checkout_amount_to_use', $invoice->total, $invoice); // Amount in kobo.
-
-
-		$two_checkout_data = apply_filters(
-			'ms_gateway_two_checkout_form_details_after',
-			$two_checkout_data,
-			$invoice
-		);
+		
 		ob_start();
 		?>
 
@@ -86,8 +47,6 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 					MS_Helper_Html::html_element( $field );
 				}
 			?>
-            <input type='hidden' name='li_0_name' value='Monthly Subscription' />
-            <input type='hidden' name='li_0_recurrence' value='1 Month' />
 		</form>
 
 		<?php
@@ -128,14 +87,12 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 	private function prepare_fields() {
 		$gateway = $this->data['gateway'];
 		$subscription = $this->data['ms_relationship'];
+		$membership = $subscription->get_membership();
         $invoice = $subscription->get_current_invoice();
+		$member = $subscription->get_member();
 
 		$fields = array(
-			'_wpnonce' => array(
-				'id' => '_wpnonce',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => wp_create_nonce( "{$gateway->id}_{$subscription->id}" ),
-			),
+
             'sid' => array(
                 'id' => 'sid',
                 'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
@@ -146,30 +103,36 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => '2CO',
 			),
-			'gateway' => array(
-				'id' => 'product',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => 'product',
-			),
-			'li_0_type' => array(
-				'id' => 'gateway',
-				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => $gateway->id,
-			),
-			'li_0_name' => array(
+			'name' => array(
 				'id' => 'li_0_name',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-				'value' => 'Monthly Subscription',
+				'value' => $membership->name,
 			),
-			'li_0_recurrence' => array(
+			'recurrence' => array(
 				'id' => 'li_0_recurrence',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => '1 Month',
 			),
-			'li_0_tangible' => array(
+			'tangible' => array(
 				'id' => 'li_0_tangible',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => 'N',
+			),
+
+			'skip_landing' => array(
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'id' => 'skip_landing',
+				'value' => '1',
+			),
+			'user_id' => array(
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'id' => 'user_id',
+				'value' => $member->id,
+			),
+			'merchant_order_id' => array(
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'id' => 'merchant_order_id',
+				'value' => $invoice->id,
 			),
 
             'price' => array(
@@ -177,10 +140,25 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $invoice->total,
 			),
+			'email' => array(
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'id' => 'email',
+				'value' => $member->email,
+			),
 			'ms_relationship_id' => array(
 				'id' => 'ms_relationship_id',
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $subscription->id,
+			),
+			'return_url' => array(
+				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+				'id' => 'x_receipt_link_url',
+				'value' => esc_url_raw(
+					add_query_arg(
+						array( 'ms_relationship_id' => $subscription->id ),
+						MS_Model_Pages::get_page_url( MS_Model_Pages::MS_PAGE_REG_COMPLETE, false )
+					)
+				),
 			),
 		);
 

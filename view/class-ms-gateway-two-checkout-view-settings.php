@@ -6,10 +6,17 @@ class MS_Gateway_Two_Checkout_View_Settings extends MS_View {
 		$fields = $this->prepare_fields();
 		$gateway = $this->data['model'];
 
-		$msg = '<em>'.__(
-			"2Checkout Forms API KEYS Settings!\n Your webhook URL is: http://www.ibiene.com/ms-payment-return/".MS_Gateway_Two_Checkout::ID, 'membership-two-checkout'
-		) .
-		'</em>';
+		$msg = sprintf(
+				'%1$s<br />&nbsp;<br />%2$s <strong>%3$s</strong><br />%6$s <strong>%7$s</strong><br /><a href="%4$s" target="_blank">%5$s</a>',
+				__( 'In order for Membership 2 to function correctly you must setup an INS (Instant Notification Service) URL with 2Checkout. Make sure you add the following URLs to your 2Checkout "Notifications" section as well as the "Approved URL" in the Site Management section. The domain must be the same as the one registered with your Live account for production sites.', MS_TEXT_DOMAIN ),
+				__( 'Your Global Notifications URL is:', MS_TEXT_DOMAIN ),
+				$this->data['model']->get_return_url(),
+				'https://www.2checkout.com/documentation/notifications/',
+				__( 'Instructions &raquo;', MS_TEXT_DOMAIN ),
+				__( 'Your "Approved URL" is:', MS_TEXT_DOMAIN ),
+				MS_Model_Pages::get_page_url( MS_Model_Pages::MS_PAGE_REG_COMPLETE )
+			);
+
 
 		ob_start();
 		// Render tabbed interface.

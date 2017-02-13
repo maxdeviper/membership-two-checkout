@@ -143,85 +143,6 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
 
 
     /**
-     * Processes purchase action.
-     *
-     * This function is called when a payment was made: We check if the
-     * transaction was successful. If it was we call `$invoice->changed()` which
-     * will update the membership status accordingly.
-     *
-     *
-     * @throws Exception
-     * @since  1.0.0
-     * @param MS_Model_Relationship $subscription The related membership relationship.
-     * @return mixed|MS_Model_Invoice|void
-     */
-    public function process_purchase( $subscription ) {
-        do_action(
-            'ms_gateway_process_purchase_before',
-            $subscription,
-            $this
-        );
-        $invoice = $subscription->get_current_invoice();
-        $invoice->gateway_id = $this->id;
-        $invoice->save();
-
-        // The default handler only processes free subscriptions.
-        if ( 0 == $invoice->total ) {
-            $invoice->changed();
-        } else {
-            
-            if (empty($_POST['transaction_ref'])){
-                //throw new Exception('Transaction not verified');
-            }
-            $transaction_ref = filter_input(INPUT_POST,'transaction_ref', FILTER_SANITIZE_STRING);
-            // use 2Checkout inputed reference if set
-            if(isset($_POST['two_checkout-reference']) && !empty($_POST['two_checkout-reference'])){
-                $transaction_ref = filter_input(INPUT_POST,'two_checkout-reference', FILTER_SANITIZE_STRING);
-            }
-            //@todo : Refactor to seperate class
-            $verification_url = 'https://api.two_checkout.co/transaction/verify/' . $transaction_ref;
-            $headers = array(
-                'Authorization' => 'Bearer ' . $this->private_key(),
-            );
-            $args = array(
-                'headers'   => $headers,
-                'timeout'   => 60
-            );
-            $request = wp_remote_get($verification_url, $args);
-            if(is_wp_error( $request )) {
-                MS_Helper_Debug::log('error_in_billing');
-                throw new Exception('error_in_billing');
-            }
-            $two_checkout_response = json_decode( wp_remote_retrieve_body( $request ) );
-            if ($two_checkout_response->status == true){
-                error_log(json_encode($two_checkout_response));
-                // setting up customer update request
-                $update_customer_url = 'https://api.two_checkout.co/customer/'.$two_checkout_response->data->customer->customer_code;
-                $args['method'] = 'PUT';
-                $args['body'] = json_encode(array(
-                    'metadata' => array(
-                        'subscription' => array(
-                            'id' => $subscription->id,
-                        ),
-                    )
-                ));
-                $args['headers']['Content-Type'] = 'application/json';
-                $request = wp_remote_request($update_customer_url, $args);
-                error_log(PHP_EOL.'Url for customer update ='.$update_customer_url.PHP_EOL);
-                error_log(PHP_EOL.'args ='.print_r($args, true).PHP_EOL);
-                error_log(PHP_EOL.'response::'.print_r($request, true).PHP_EOL);
-                if(is_wp_error( $request )) {
-                    MS_Helper_Debug::log('Failed to update customer 2Checkout data');
-                    throw new Exception('Failed to update customer 2Checkout data');
-                }
-
-                $invoice->pay_it( self::ID, $transaction_ref );
-            }
-            return $invoice;
-        }
-    }
-
-    /**
      * Processes gateway IPN return.
      *
      * Overridden in child gateway classes.
@@ -234,6 +155,8 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
     {
         $success = false;
         $notes = '';
+        $exit = false;
+        $status = null;
         $external_id = '';
         $amount = 0;
         $subscription_id = 0;
@@ -245,86 +168,141 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
         foreach ($_REQUEST as $k => $v) {
             $params[$k] = $v;
         }
-
-        $passback = Twocheckout_Return::check($params, $this->secret_word());
-        if(strcasecmp($passback['response_code'], self::HASH_RESPONSE_CODE) != 0
+        $passback = Twocheckout_Notification::check($params, $this->secret_word());
+        //$passback = Twocheckout_Return::check($params, $this->secret_word());
+        if (
+             (strcasecmp($passback['response_code'], self::HASH_RESPONSE_CODE) != 0)
             &&
-            strcasecmp($passback['response_message'], self::HASH_RESPONSE_MESSAGE) != 0
+            (
+                strcasecmp($passback['response_message'], self::HASH_RESPONSE_MESSAGE) != 0
+            ) 
+            &&
+            empty( $_POST['vendor_order_id'] )
         ){
-            http_response_code(404);
-            die('Hash Incorrect');
-        }
-        http_response_code(200);
-        error_log(print_r($_REQUEST, true));
-        die();
-        // parse event (which is json string) as object
-        // Do something - that will not take long - with $event
-        $response = json_decode($input);
-        $event = $response->event;
-        $data = $response->data;
-        error_log(json_encode($input));
-        $meta_data = $data->customer->metadata;
-        if (!$meta_data){
-            error_log('Metadata is empty');
-            return;
-        }
-        /** @var MS_Model_Relationship $subscription */
-        $subscription = MS_Factory::load(
-                'MS_Model_Relationship',
-                $meta_data->subscription->id
-            );
-        
-        if (!$subscription){
-            error_log('No membership 2 subscription found in event');
-            return;
-        }
-        $invoice = $subscription->get_current_invoice();
-         switch ($event) {
-             case 'subscription.create':
-                 $subscription->set_custom_data('two_checkout_subscription_code', $data->subscription_code);
-                 $notes = __('Customer 2Checkout Subscription created', 'membership-two-checkout');
-                 $subscription->save();
+           // Did not find expected POST variables. Possible access attempt from a non PayPal site.
 
-                 $success = true;
-                 break;
-            case 'subscription.disable':
-                $notes = __('Customer 2Checkout Subscription disabled', 'membership-two-checkout');
-                $subscription->status = MS_Model_Relationship::STATUS_CANCELED;
-                $subscription->save();
+           $reason = 'Hash invalid';
 
-                $success = true;
-                break;
-            case 'subscription.enable':
-                $subscription->status = MS_Model_Relationship::STATUS_ACTIVE;
-                $subscription->save();
-                $notes = __('Customer 2Checkout Subscription enabled', 'membership-two-checkout');
 
-                $success = true;
-                break;
-            case 'invoice.create':
-            case 'invoice.update':
-                $external_id = $data->transaction->reference;
-                $invoice->pay_it(self::ID, $external_id );
-                $notes = __('Subscription successfully paid for', 'membership-two-checkout');
-                $success = true;
-                break;
+            $notes = 'Response Error: ' . $reason;
+            MS_Helper_Debug::log( $notes );
+            $exit = true;
+        }else {
+            // Process notification since has is valid
+            $invoice_id = intval( $_POST['vendor_order_id'] );
+            $invoice = MS_Factory::load( 'MS_Model_Invoice', $invoice_id );
+            $subscription = $invoice->get_subscription();
+                $membership = $subscription->get_membership();
+                $member = $subscription->get_member();
+                $subscription_id = $subscription->id;
+                $external_id = $_POST['invoice_id'];
+                $amount = (float) $_POST['invoice_list_amount'];
+
+                switch ( $_POST['message_type'] ) {
+                    case 'RECURRING_INSTALLMENT_SUCCESS':
+                        $notes = 'Payment received';
+
+                        // Not sure if the invoice was already paid via the
+                        // INVOICE_STATUS_CHANGED message
+                        if ( ! $invoice->is_paid() ) {
+                            $success = true;
+                        }
+                        break;
+
+                    case 'INVOICE_STATUS_CHANGED':
+                        $notes = sprintf(
+                            'Invoice was %s',
+                            $_POST['invoice_status']
+                        );
+
+                        switch ( $_POST['invoice_status'] ) {
+                            case 'deposited':
+                                // Not sure if invoice was already paid via the
+                                // RECURRING_INSTALLMENT_SUCCESS message.
+                                if ( ! $invoice->is_paid() ) {
+                                    $success = true;
+                                }
+                                break;
+
+                            case ' declined':
+                                $status = MS_Model_Invoice::STATUS_DENIED;
+                                break;
+                        }
+                        break;
+
+                    case 'RECURRING_STOPPED':
+                        $notes = 'Recurring payments stopped manually';
+                        $member->cancel_membership( $membership->id );
+                        $member->save();
+                        break;
+
+                    case 'FRAUD_STATUS_CHANGED':
+                        $notes = 'Ignored: Users Fraud-status was checked';
+                        $success = null;
+                        break;
+
+                    case 'ORDER_CREATED':
+                        $notes = 'Ignored: 2Checkout created a new order';
+                        $success = null;
+                        break;
+
+                    case 'RECURRING_RESTARTED':
+                        $notes = 'Ignored: Recurring payments started';
+                        $success = null;
+                        break;
+
+                    case 'RECURRING_COMPLETE':
+                        $notes = 'Ignored: Recurring complete';
+                        $success = null;
+                        break;
+
+                    case 'RECURRING_INSTALLMENT_FAILED':
+                        $notes = 'Ignored: Recurring payment failed';
+                        $success = null;
+                        $status = MS_Model_Invoice::STATUS_PENDING;
+                        break;
+
+                    default:
+                        $notes = sprintf(
+                            'Warning: Unclear command "%s"',
+                            $_POST['message_type']
+                        );
+                        break;
+                }
+
+                $invoice->add_notes( $notes );
+                $invoice->save();
+
+                if ( $success ) {
+                    $invoice->pay_it( $this->id, $external_id );
+                } elseif ( ! empty( $status ) ) {
+                    $invoice->status = $status;
+                    $invoice->save();
+                    $invoice->changed();
+                }
+                do_action(
+                    'ms_gateway_two_checkout_payment_processed_' . $status,
+                    $invoice,
+                    $subscription
+                );
 
         }
-        if($log){
-            $log->invoice_id = $invoice_id;
-            $log->subscription_id = $subscription_id;
-            $log->amount = $amount;
-            $log->description = $notes;
-            $log->external_id = $external_id;
-            if ( $success ) {
-                    $log->manual_state( 'ok' );
-            } elseif ( $ignore ) {
-                    $log->manual_state( 'ignore' );
-            }
-            $log->save();
-        }else{
+     
+        // if($log){
+        //     $log->invoice_id = $invoice_id;
+        //     $log->subscription_id = $subscription_id;
+        //     $log->amount = $amount;
+        //     $log->description = $notes;
+        //     $log->external_id = $external_id;
+        //     if ( $success ) {
+        //             $log->manual_state( 'ok' );
+        //     } elseif ( $ignore ) {
+        //             $log->manual_state( 'ignore' );
+        //     }
+        //     $log->save();
+        // }else{
             
-        }
+        // }
         do_action(
                     'ms_gateway_transaction_log',
                     self::ID, // gateway ID
@@ -332,10 +310,17 @@ class MS_Gateway_Two_Checkout extends MS_Gateway
                     $success, // success flag
                     $subscription->id, // subscription ID
                     $invoice->id, // invoice ID
-                    $invoice->total, // charged amount
+                    $amount, // charged amount
                     $notes, // Descriptive text
                     $external_id // External ID
 		);
+        if ( $redirect ) {
+            wp_safe_redirect( $redirect );
+            exit;
+        }
+        if ( $exit ) {
+            exit;
+        }
     }
 
     public function get_checkout_url()
