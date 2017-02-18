@@ -174,7 +174,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 					$membership->pay_cycle_period,
 					'period_unit'
 				);
-				die(var_dump($period_type, $period_unit));
+				die(var_dump($membership->pay_cycle_period));
 				// $period_value = MS_Helper_Period::validate_range(
 				// 	$period_value,
 				// 	$period_type
