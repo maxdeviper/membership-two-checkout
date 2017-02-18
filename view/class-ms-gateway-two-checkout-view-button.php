@@ -174,14 +174,29 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 					$membership->pay_cycle_period,
 					'period_unit'
 				);
-				// $period_value = MS_Helper_Period::validate_range(
-				// 	$period_value,
-				// 	$period_type
-				// );
+				$unit = $membership->pay_cycle_period['period_unit'];
+				$type = $membership->pay_cycle_period['period_type'];
+				if (intval($unit) < 2){
+					switch ($type) {
+						case 'months':
+							$type = 'month';
+							break;
+						case 'days':
+							$type = 'day';
+							break;
+						case 'weeks':
+							$type = 'week';
+							break;
+						case 'years':
+							$type = 'year';
+							break;
+					}
+				}
+
 				$fields['recurrence'] = array(
 					'id' => 'li_0_recurrence',
 					'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-					'value' =>implode(' ', $membership->pay_cycle_period),
+					'value' =>$unit . ' ' . $type,
 				);
 		}
 		if ( false !== strpos( $gateway->pay_button_url, '://' ) ) {
