@@ -181,7 +181,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				$fields['recurrence'] = array(
 					'id' => 'li_0_recurrence',
 					'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
-					'value' => $period_value,
+					'value' => $period_value . ' ' .$period_unit,
 				);
 		}
 		if ( false !== strpos( $gateway->pay_button_url, '://' ) ) {
