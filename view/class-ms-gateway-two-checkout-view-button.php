@@ -174,10 +174,10 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 					$membership->pay_cycle_period,
 					'period_unit'
 				);
-				$period_value = MS_Helper_Period::validate_range(
-					$period_value,
-					$period_type
-				);
+				// $period_value = MS_Helper_Period::validate_range(
+				// 	$period_value,
+				// 	$period_type
+				// );
 				$fields['recurrence'] = array(
 					'id' => 'li_0_recurrence',
 					'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
