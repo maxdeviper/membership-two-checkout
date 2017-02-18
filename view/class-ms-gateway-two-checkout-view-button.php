@@ -108,6 +108,7 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
 				'value' => $membership->name,
 			),
+			
 			// 'recurrence' => array(
 			// 	'id' => 'li_0_recurrence',
 			// 	'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
@@ -161,7 +162,28 @@ class MS_Gateway_Two_Checkout_View_Button extends MS_View {
 				),
 			),
 		);
-
+		if ( MS_Model_Membership::PAYMENT_TYPE_RECURRING == $membership->payment_type ) {
+				#'li_0_reccurance' = '2 days'   // Can use # Week / # Month / # Year
+				#'li_0_duration' = 'Forever'    // Same as _recurrence, with additional "Forever" option
+				$period_type = MS_Helper_Period::get_period_value(
+					$membership->pay_cycle_period,
+					'period_type'
+				);
+				$period_type = strtoupper( $period_type[0] );
+				$period_value = MS_Helper_Period::get_period_value(
+					$membership->pay_cycle_period,
+					'period_unit'
+				);
+				$period_value = MS_Helper_Period::validate_range(
+					$period_value,
+					$period_type
+				);
+				$fields['recurrence'] = array(
+					'id' => 'li_0_recurrence',
+					'type' => MS_Helper_Html::INPUT_TYPE_HIDDEN,
+					'value' => $period_value,
+				);
+		}
 		if ( false !== strpos( $gateway->pay_button_url, '://' ) ) {
 			$fields['submit'] = array(
 				'id' => 'submit-payment',
